@@ -1,11 +1,28 @@
 use core::panic;
+use std::path::PathBuf;
 use image::{GenericImageView, Pixel, Rgb};
+use clap::Parser;
+
+#[derive(Parser)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long, required = true)]
+    image: PathBuf,
+
+    #[arg(short = 'x', long, default_value_t = 80)]
+    width: u32,
+
+    #[arg(short = 'y', long, default_value_t = 80)]
+    height: u32,
+}
 
 fn main() {
-    let image_result = image::open("img.png");
+    let args = Args::parse();
+
+    let image_result = image::open(args.image);
 
     let img = match image_result {
-        Ok(img) => img.resize(80, 80, image::imageops::FilterType::Gaussian).rotate270(),
+        Ok(img) => img.resize(args.width, args.height, image::imageops::FilterType::Gaussian).rotate270(),
         Err(error) => panic!("Could not open image: {:?}", error),
     };
 
