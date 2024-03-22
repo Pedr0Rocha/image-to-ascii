@@ -12,7 +12,8 @@ struct Args {
     #[arg(short = 'x', long, default_value_t = 80)]
     width: u32,
 
-    #[arg(short = 'y', long, default_value_t = 80)]
+    // 'h' is already short for --help
+    #[arg(short = 'y', long, default_value_t = 40)]
     height: u32,
 }
 
@@ -22,14 +23,14 @@ fn main() {
     let image_result = image::open(args.image);
 
     let img = match image_result {
-        Ok(img) => img.resize(args.width, args.height, image::imageops::FilterType::Gaussian).rotate270(),
+        Ok(img) => img.resize_exact(args.width, args.height, image::imageops::FilterType::Gaussian),
         Err(error) => panic!("Could not open image: {:?}", error),
     };
 
     let (width, height) = img.dimensions();
 
-    for x in 0..width {
-        for y in 0..height {
+    for y in 0..height {
+        for x in 0..width {
             let pixel_rgb = img.get_pixel(x, y).to_rgb();
             let brightness = get_brightness(pixel_rgb);
             // println!("R={} G={} B={} = {}", pixel_rgb[0], pixel_rgb[1], pixel_rgb[2], brightness);
